@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +15,8 @@ namespace Frends.Community.Gremlin.Tests
     [TestFixture]
     class GremlinIntegrationTest
     {
-        GraphQueries _graphQueries = new GraphQueries();
+        VertexQueries _graphVertexQueries = new VertexQueries();
+        ParamaterQueries _parameterQueries = new ParamaterQueries();
         ServerConfiguration _input = new ServerConfiguration();
         QueryProperty[] _gremlinQueryProperties = new QueryProperty[]{};
         GraphQueries.GraphContainer.VertexPropertyForGraph[] _vertexPropertyForGraphs = new GraphQueries.GraphContainer.VertexPropertyForGraph[]{};
@@ -38,9 +40,11 @@ namespace Frends.Community.Gremlin.Tests
             _vertexForGraph.VertexLabel = v1.Label;
             SetUpVertexPropertyQueries(_vertexForGraph);
             
-            _graphQueries.Vertices = new GraphQueries.GraphContainer.VertexForGraph[]{_vertexForGraph};
-            _graphQueries.BuildGraphMessage();
-            _graphQueries.GremlinQueryProperties = this.SetUpQueryProperties();//SetUpQueryProperties() == null ? new Options.QueryProperty[] { } : SetUpQueryProperties();
+            _graphVertexQueries.Vertices = new GraphQueries.GraphContainer.VertexForGraph[]{_vertexForGraph};
+            _graphVertexQueries.BuildGraphMessage();
+            
+            
+            _parameterQueries.GremlinQueryProperties = this.SetUpQueryProperties();//SetUpQueryProperties() == null ? new Options.QueryProperty[] { } : SetUpQueryProperties();
             
             _datasourceConfiguration = new DatasourceConfiguration()
             {
@@ -49,8 +53,16 @@ namespace Frends.Community.Gremlin.Tests
 
         private void SetUpVertexPropertyQueries(GraphQueries.GraphContainer.VertexForGraph vertexForGraph)
         {
-            GraphQueries.GraphContainer.VertexPropertyForGraph vertexProperty1 = new GraphQueries.GraphContainer.VertexPropertyForGraph("1", "Name", "Ilkka");
-            GraphQueries.GraphContainer.VertexPropertyForGraph vertexProperty2 = new GraphQueries.GraphContainer.VertexPropertyForGraph("2", "Name", "Tuomas");
+            GraphQueries.GraphContainer.VertexPropertyForGraph vertexProperty1 =
+                new GraphQueries.GraphContainer.VertexPropertyForGraph()
+                {
+                    id = "1", label = "Name", value = "Ilkka"
+                };
+            GraphQueries.GraphContainer.VertexPropertyForGraph vertexProperty2 =
+                new GraphQueries.GraphContainer.VertexPropertyForGraph()
+                {
+                    id = "2", label = "Name", value = "Tuomas"
+                };
             _vertexPropertyForGraphs = new [] {vertexProperty1, vertexProperty2};
         }
         
@@ -83,11 +95,12 @@ namespace Frends.Community.Gremlin.Tests
         //[Test]
         public async Task GivenKnownGraphQueryWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
         {
-            ResultSet<object> results = Gremlin.ExecuteSingleQuery(_input, _datasourceConfiguration, _graphQueries, CancellationToken.None).Result;
-            foreach (T o in results.ToList())
+            IList<string> results = Gremlin.ExecuteVertexQuery(_graphVertexQueries, _datasourceConfiguration, _input, CancellationToken.None).Result;
+            
+            /**foreach (T o in results.ToList())
             {
                Console.WriteLine(o.ToString());  
-            }
+            }**/
             
             //List<object> gremlinResponses = results.
             //gremlinResponses.ForEach(i => Console.WriteLine(i.ToString()));
@@ -123,17 +136,23 @@ namespace Frends.Community.Gremlin.Tests
             //Task<ResultSet<Object>> dynamicResultSet =
               //  Gremlin.ExecuteQuery(input, options, configuration, CancellationToken.None);
             //var response = await Gremlin.ExecuteQuery(input, options, configuration, CancellationToken.None);
+            
+            Task<IList<string>> results = Gremlin.ExecuteParameterQuery(_parameterQueries, _datasourceConfiguration, _input, CancellationToken.None);
+            //results.Result;
+            /*
             var results = _graphQueries.GremlinQueryProperties?.Select(q =>
+               
                 new Response()
                 {
                     Key = q.Key,
                     dynamicResultSetForResponse = Gremlin.ExecuteParameterQuery(_input, _datasourceConfiguration, _graphQueries, CancellationToken.None),
                 }).AsParallel().ToList();
+            */
             //IList<object> results = response as IList<object>;
-            results?.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSetForResponse.Result)); 
-            results?.ForEach(i => Console.WriteLine(i.Value));
-            if(results!=null)
-                Assert.AreEqual(4, results?.Count());
+            //results?.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSetForResponse.Result)); 
+            //results?.ForEach(i => Console.WriteLine(i.Value));
+            //if(results!=null)
+                //Assert.AreEqual(4, results?.Count());
         }
         
         [TearDown]
@@ -141,7 +160,7 @@ namespace Frends.Community.Gremlin.Tests
         {
             _gremlinQueryProperties = null;
             _input = null;
-            _graphQueries = null;
+            _graphVertexQueries = null;
         }
     }
 }

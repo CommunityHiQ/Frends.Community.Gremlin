@@ -13,14 +13,13 @@ using Newtonsoft.Json;
 
 namespace Frends.Community.Gremlin
 {
-    
     public class Gremlin
     {
         
-        public static async Task<ResultSet<object>> ExecuteParameterQuery(
-            [PropertyTab] ServerConfiguration serverConfiguration,
+        public static async Task<IList<string>> ExecuteParameterQuery(
+            [PropertyTab] ParamaterQueries graphQueries,
             [PropertyTab] DatasourceConfiguration datasourceConfiguration,
-            [PropertyTab] GraphQueries graphQueries,
+            [PropertyTab] ServerConfiguration serverConfiguration,
             CancellationToken cancellationToken)
         {
             // Synchronised scheduling of tasks
@@ -33,32 +32,56 @@ namespace Frends.Community.Gremlin
             var requests = SendParameterQuery(graphQueries, gremlinServer, scheduler);
 
             // Response to be returned
-            IList<String> response = await LoadResults(requests, scheduler);
+            IList<String> responses = await LoadResults(requests, scheduler);
 
             // Load async result
-            return (ResultSet<object>) response.Cast<object>();
+            return responses;
         }
         
-        public static async Task<ResultSet<object>> ExecuteSingleQuery(
-            [PropertyTab] ServerConfiguration serverConfiguration,
+        
+        public static async Task<IList<string>> ExecuteScriptQuery(
+            [PropertyTab] ScriptQueries graphScriptQueries,
             [PropertyTab] DatasourceConfiguration datasourceConfiguration,
-            [PropertyTab] GraphQueries graphQueries,
+            [PropertyTab] ServerConfiguration serverConfiguration,
             CancellationToken cancellationToken)
         {
             // Synchronised scheduling of tasks
-            var scheduler = TaskScheduler.Current;
+            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
             // Gremlin server configuration
             var gremlinServer = InitializeGremlinServer(serverConfiguration, datasourceConfiguration);
 
             // Send async queries into the Graph API
-            var requests = SendSingleGraphQuery(graphQueries, gremlinServer, scheduler);
+            var requests = SendSingleGraphQuery(graphScriptQueries, gremlinServer, scheduler);
 
             // Response to be returned
             IList<String> response = await LoadResults(requests, scheduler);
 
             // Load async result
-            return (ResultSet<object>) response.Cast<object>();
+            return response;
+            //return (ResultSet<object>) response.Cast<object>();
+        }
+        public static async Task<IList<string>> ExecuteVertexQuery(
+            [PropertyTab] VertexQueries graphScriptQueries,
+            [PropertyTab] DatasourceConfiguration datasourceConfiguration,
+            [PropertyTab] ServerConfiguration serverConfiguration,
+            CancellationToken cancellationToken)
+        {
+            // Synchronised scheduling of tasks
+            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+            // Gremlin server configuration
+            var gremlinServer = InitializeGremlinServer(serverConfiguration, datasourceConfiguration);
+
+            // Send async queries into the Graph API
+            var requests = SendVertexGraphQuery(graphScriptQueries, gremlinServer, scheduler);
+
+            // Response to be returned
+            IList<String> response = await LoadResults(requests, scheduler);
+
+            // Load async result
+            return response;
+            //return (ResultSet<object>) response.Cast<object>();
         }
 
         private static GremlinServer InitializeGremlinServer(ServerConfiguration serverConfiguration, DatasourceConfiguration datasourceConfiguration)
@@ -69,24 +92,44 @@ namespace Frends.Community.Gremlin
             return gremlinServer;
         }
 
-        private static IList<Response> SendSingleGraphQuery(GraphQueries graphQueries,
+        private static IList<Response> SendSingleGraphQuery(ScriptQueries graphScriptQueries,
             GremlinServer gremlinServer, TaskScheduler scheduler)
         {
             using (var gremlinClient = new GremlinClient(gremlinServer, new GraphSON2Reader(), new GraphSON2Writer(),
                 GremlinClient.GraphSON2MimeType))
             {
-                var results = graphQueries.BuildGraphMessage().Select(q =>
+                if (graphScriptQueries.GremlinScript == null) 
+                    graphScriptQueries.BuildGraphMessage();
+                var results = graphScriptQueries.GremlinScript.Select(q =>
                         new Response
                         {
                             Key = "Frends Task Execution : " + DateTime.Now,
-                            dynamicResultSetForResponse = SubmitSingleRequest(gremlinClient, graphQueries, scheduler),
+                            dynamicResultSetForResponse = SubmitSingleRequest(gremlinClient, graphScriptQueries, scheduler),
                         }).ToList()
                     .AsParallel().ToList();
                 return results;
             }
         }
         
-        private static IList<Response> SendParameterQuery(GraphQueries graphQueries, GremlinServer gremlinServer,
+        private static IList<Response> SendVertexGraphQuery(VertexQueries vertexQueries,
+            GremlinServer gremlinServer, TaskScheduler scheduler)
+        {
+            using (var gremlinClient = new GremlinClient(gremlinServer, new GraphSON2Reader(), new GraphSON2Writer(),
+                GremlinClient.GraphSON2MimeType))
+            {
+                
+                var results = vertexQueries.MessageContainer.Select(q =>
+                        new Response
+                        {
+                            Key = "Frends Task Execution : " + DateTime.Now,
+                            dynamicResultSetForResponse = SubmitVertexRequest(gremlinClient, vertexQueries, scheduler),
+                        }).ToList()
+                    .AsParallel().ToList();
+                return results;
+            }
+        }
+        
+        private static IList<Response> SendParameterQuery(ParamaterQueries graphQueries, GremlinServer gremlinServer,
             TaskScheduler scheduler)
         {
             using (var gremlinClient = new GremlinClient(gremlinServer, new GraphSON2Reader(), new GraphSON2Writer(),
@@ -111,12 +154,45 @@ namespace Frends.Community.Gremlin
             return new List<string>();
         }
 
-        private static async Task<ResultSet<dynamic>> SubmitSingleRequest(GremlinClient gremlinClient, GraphQueries graphQueries,
+        private static async Task<ResultSet<dynamic>> SubmitVertexRequest(GremlinClient gremlinClient, VertexQueries vertexQueries,
             TaskScheduler taskScheduler)
         {
             try
             {
-                return gremlinClient.SubmitWithSingleResultAsync<dynamic>(graphQueries.GremlinScript).Result;
+                return gremlinClient.SubmitWithSingleResultAsync<dynamic>(vertexQueries.MessageContainer).Result;
+            }
+            catch (ResponseException e)
+            {
+                throw new WebException(
+                    $"Request to server failed with status code {(int) e.StatusCode}. Response body: ");
+                throw;
+            }
+            catch (ThreadInterruptedException e)
+            {
+                if (gremlinClient != null)
+                {
+                    gremlinClient.Dispose();
+                }
+
+                throw new WebException(
+                    $"Request to server failed with status code {e}. Response body: ");
+                throw;
+            }
+            finally
+            {
+                if (gremlinClient != null)
+                {
+                    gremlinClient.Dispose();
+                }
+            }
+        }
+        
+        private static async Task<ResultSet<dynamic>> SubmitSingleRequest(GremlinClient gremlinClient, ScriptQueries graphScriptQueries,
+            TaskScheduler taskScheduler)
+        {
+            try
+            {
+                return gremlinClient.SubmitWithSingleResultAsync<dynamic>(graphScriptQueries.GremlinScript).Result;
             }
             catch (ResponseException e)
             {

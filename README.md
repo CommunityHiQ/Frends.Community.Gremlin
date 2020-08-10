@@ -6,7 +6,7 @@ FRENDS Community Task for Echo
 
 - [Installing](#installing)
 - [Tasks](#tasks)
-     - [Echo](#Echo)
+     - [Gremlin](#Gremlin)
 - [Building](#building)
 - [Contributing](#contributing)
 - [Change Log](#change-log)
@@ -14,11 +14,11 @@ FRENDS Community Task for Echo
 # Installing
 
 You can install the task via FRENDS UI Task View or you can find the NuGet package from the following NuGet feed
-https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view in MyGet https://www.myget.org/feed/frends-community/package/nuget/Frends.Community.Gremlin
+s and in Gallery view in MyGet https://www.myget.org/feed/frends-community/package/nuget/Frends.Community.Gremlin
 
 # Tasks
 
-## Echo
+## Gremlin
 
 Repeats message
 

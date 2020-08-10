@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>net461</TargetFrameworks>
+	<TargetFrameworks>net471</TargetFrameworks>
     <description>This is template task.</description>
     <authors>HiQ Finland</authors>
     <copyright>HiQ Finland</copyright>
