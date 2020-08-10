@@ -1,0 +1,64 @@
+﻿{
+  "version": "1.0.0",
+  "restore": {
+    "projectUniqueName": "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin.Tests/Frends.Community.Gremlin.Tests.csproj",
+    "projectName": "Frends.Community.Gremlin.Tests",
+    "projectPath": "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin.Tests/Frends.Community.Gremlin.Tests.csproj",
+    "outputPath": "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin.Tests/obj/",
+    "projectStyle": "PackageReference",
+    "crossTargeting": true,
+    "originalTargetFrameworks": [
+      "net471"
+    ],
+    "sources": {
+      "https://api.nuget.org/v3/index.json": {}
+    },
+    "frameworks": {
+      "net471": {
+        "projectReferences": {
+          "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/Frends.Community.Gremlin.csproj": {
+            "projectPath": "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/Frends.Community.Gremlin.csproj"
+          }
+        }
+      }
+    },
+    "warningProperties": {
+      "warnAsError": [
+        "NU1605"
+      ]
+    }
+  },
+  "frameworks": {
+    "net471": {
+      "dependencies": {
+        "Gremlin.Net": {
+          "target": "Package",
+          "version": "[3.4.7, )"
+        },
+        "GremlinQueryPackage": {
+          "target": "Package",
+          "version": "[0.3.3, )"
+        },
+        "Gremlins.DataAccess": {
+          "target": "Package",
+          "version": "[1.0.5, )"
+        },
+        "Microsoft.NET.Test.Sdk": {
+          "target": "Package",
+          "version": "[16.6.1, )"
+        },
+        "NUnit3TestAdapter": {
+          "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+          "suppressParent": "All",
+          "target": "Package",
+          "version": "[3.10.0, )"
+        },
+        "nunit": {
+          "target": "Package",
+          "version": "[3.10.0, )"
+        }
+      },
+      "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
+    }
+  }
+}

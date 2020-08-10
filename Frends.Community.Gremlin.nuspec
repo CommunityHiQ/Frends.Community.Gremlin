@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Frends.Community.Gremlin</id>
+    <version>1.0.33</version>
+    <title>Frends frendstask client</title>
+    <authors>HiQ Finland</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Task for connecting the frendstask backend</description>
+    <summary />
+    <dependencies>
+   <group targetFramework=".NETFramework4.7.1" >
+        <dependency id="Gremlin.Net" version="3.4.7" />
+   </group>
+</dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" targetFramework="net471" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="/Users/leinoil/Development/dotnet/Frends.Community.Gremlin/Frends.Community.Gremlin/bin/Release/net471/Frends.Community.Gremlin.dll" target="lib\net471\Frends.Community.Gremlin.dll" />
+  </files>
+</package>

@@ -1,0 +1,119 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/Frends.Community.Gremlin.csproj": {}
+  },
+  "projects": {
+    "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/Frends.Community.Gremlin.csproj": {
+      "version": "0.0.6",
+      "restore": {
+        "projectUniqueName": "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/Frends.Community.Gremlin.csproj",
+        "projectName": "Frends.Community.Gremlin",
+        "projectPath": "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/Frends.Community.Gremlin.csproj",
+        "packagesPath": "/Users/leinoil/.nuget/packages/",
+        "outputPath": "/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/obj/",
+        "projectStyle": "PackageReference",
+        "crossTargeting": true,
+        "configFilePaths": [
+          "/Users/leinoil/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net471",
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net471": {
+            "projectReferences": {}
+          },
+          "netstandard2.0": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net471": {
+          "dependencies": {
+            "Gremlin.Net": {
+              "target": "Package",
+              "version": "[3.4.7, )"
+            },
+            "GremlinQueryPackage": {
+              "target": "Package",
+              "version": "[0.3.3, )"
+            },
+            "Gremlins.DataAccess": {
+              "target": "Package",
+              "version": "[1.0.5, )"
+            },
+            "Microsoft.CSharp": {
+              "target": "Package",
+              "version": "[4.5.0, )"
+            },
+            "NUnit": {
+              "target": "Package",
+              "version": "[3.10.0, )"
+            },
+            "System.ComponentModel.Annotations": {
+              "target": "Package",
+              "version": "[4.7.0, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
+        },
+        "netstandard2.0": {
+          "dependencies": {
+            "Gremlin.Net": {
+              "target": "Package",
+              "version": "[3.4.7, )"
+            },
+            "GremlinQueryPackage": {
+              "target": "Package",
+              "version": "[0.3.3, )"
+            },
+            "Gremlins.DataAccess": {
+              "target": "Package",
+              "version": "[1.0.5, )"
+            },
+            "Microsoft.CSharp": {
+              "target": "Package",
+              "version": "[4.5.0, )"
+            },
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            },
+            "NUnit": {
+              "target": "Package",
+              "version": "[3.10.0, )"
+            },
+            "System.ComponentModel.Annotations": {
+              "target": "Package",
+              "version": "[4.7.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
