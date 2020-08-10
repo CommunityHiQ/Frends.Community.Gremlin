@@ -22,26 +22,64 @@ s and in Gallery view in MyGet https://www.myget.org/feed/frends-community/packa
 
 Repeats message
 
-### Properties
+### Create free form Graph Script Queries with a simple UI
 
-| Property | Type | Description | Example |
+         { "Cleanup",        "g.V().drop()" },
+         { "AddVertex 1",    "g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('age', 44)" },
+         { "AddVertex 2",    "g.addV('person').property('id', 'mary').property('firstName', 'Mary').property('lastName', 'Andersen').property('age', 39)" },
+         { "AddVertex 3",    "g.addV('person').property('id', 'ben').property('firstName', 'Ben').property('lastName', 'Miller')" },
+         { "AddVertex 4",    "g.addV('person').property('id', 'robin').property('firstName', 'Robin').property('lastName', 'Wakefield')" },
+         { "AddEdge 1",      "g.V('thomas').addE('knows').to(g.V('mary'))" },
+         { "AddEdge 2",      "g.V('thomas').addE('knows').to(g.V('ben'))" },
+         { "AddEdge 3",      "g.V('ben').addE('knows').to(g.V('robin'))" },
+         { "UpdateVertex",   "g.V('thomas').property('age', 44)" },
+         { "CountVertices",  "g.V().count()" },
+         { "Filter Range",   "g.V().hasLabel('person').has('age', gt(40))" },
+         { "Project",        "g.V().hasLabel('person').values('firstName')" },
+         { "Sort",           "g.V().hasLabel('person').order().by('firstName', decr)" },
+         { "Traverse",       "g.V('thomas').out('knows').hasLabel('person')" },
+         { "Traverse 2x",    "g.V('thomas').out('knows').hasLabel('person').out('knows').hasLabel('person')" },
+         { "Loop",           "g.V('thomas').repeat(out()).until(has('id', 'robin')).path()" },
+         { "DropEdge",       "g.V('thomas').outE('knows').where(inV().has('id', 'mary')).drop()" },
+         { "CountEdges",     "g.E().count()" },
+         { "DropVertex",     "g.V('thomas').drop()" }, 
+         }
+
+### Create dynamic Graph Vertex Queries with Citizen Integrator UI
+
+         { "Cleanup",        "g.V().drop()" },
+         { "AddVertex 1",    "g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('age', 44)" },
+         { "AddVertex 2",    "g.addV('person').property('id', 'mary').property('firstName', 'Mary').property('lastName', 'Andersen').property('age', 39)" },
+         { "AddVertex 3",    "g.addV('person').property('id', 'ben').property('firstName', 'Ben').property('lastName', 'Miller')" },
+         { "AddVertex 4",    "g.addV('person').property('id', 'robin').property('firstName', 'Robin').property('lastName', 'Wakefield')" },
+         { "AddEdge 1",      "g.V('thomas').addE('knows').to(g.V('mary'))" },
+         { "AddEdge 2",      "g.V('thomas').addE('knows').to(g.V('ben'))" },
+         { "AddEdge 3",      "g.V('ben').addE('knows').to(g.V('robin'))" },
+         { "UpdateVertex",   "g.V('thomas').property('age', 44)" },
+         { "CountVertices",  "g.V().count()" },
+         { "Filter",          "g.V().hasLabel('person').has('age', gt(40)).order().by('firstName', decr)" },
+         { "Traverse",       "g.V('thomas').out('knows').hasLabel('person')" },
+         { "Traverse 2x",    "g.V('thomas').out('knows').hasLabel('person').out('knows').hasLabel('person')" },
+         { "Loop",           "g.V('thomas').repeat(out()).until(has('id', 'robin')).path()" },
+         { "DropEdge",       "g.V('thomas').outE('knows').where(inV().has('id', 'mary')).drop()" },
+         { "CountEdges",     "g.E().count()" },
+         { "DropVertex",     "g.V('thomas').drop()" }, 
+         }
+
+### Create query map for vertex queries with Citizen Integrator UI
+
+| Key | Value | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Message | `string` | Some string that will be repeated. | `foo` |
+| Id | 15 | Loads the vertex with a given id. | `Id=15` |
 
-### Options
-
-| Property | Type | Description | Example |
-| -------- | -------- | -------- | -------- |
-| Amount | `int` | Amount how many times message is repeated. | `3` |
-| Delimiter | `string` | Character(s) used between replications. | `, ` |
 
 ### Returns
 
-A result object with parameters.
+List of string responses.
 
 | Property | Type | Description | Example |
 | -------- | -------- | -------- | -------- |
-| Replication | `string` | Repeated string. | `foo, foo, foo` |
+| Replication | `string` | Repeated string. | `Person = xxx` |
 
 Usage:
 To fetch result use syntax:
@@ -56,7 +94,7 @@ Clone a copy of the repo
 
 Rebuild the project
 
-`dotnet build`
+`msbuild /property:Configuration=Release`
 
 Run Tests
 
@@ -64,7 +102,7 @@ Run Tests
 
 Create a NuGet package
 
-`dotnet pack --configuration Release`
+`nuget pack ./Frends.Community.Gremlin.nuspec`
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
@@ -81,4 +119,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 | Version | Changes |
 | ------- | ------- |
-| 0.0.1   | Development stil going on. |
+| 1.0.0   | Public release of the connector. |
