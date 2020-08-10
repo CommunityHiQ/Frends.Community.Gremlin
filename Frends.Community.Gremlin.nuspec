@@ -20,6 +20,6 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="/Users/leinoil/Development/dotnet/github/Frends.Community.Gremlin/Frends.Community.Gremlin/bin/Release/net471/Frends.Community.Gremlin.dll" target="lib\net471\Frends.Community.Gremlin.dll" />
+    <file src="./Frends.Community.Gremlin/bin/Release/net471/Frends.Community.Gremlin.dll" target="lib\net471\Frends.Community.Gremlin.dll" />
   </files>
 </package>
