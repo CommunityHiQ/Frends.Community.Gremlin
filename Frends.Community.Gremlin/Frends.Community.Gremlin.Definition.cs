@@ -359,9 +359,9 @@ namespace Frends.Community.Gremlin.Definition
         /// Number of times input is echoed.
         /// </summary>
         [DefaultValue("8182")]
-        [DisplayFormat(DataFormatString = "Text")]
+        [DisplayFormat(DataFormatString = "Text")] 
         public int Port { get; set; }
-
+        
         /// <summary>
         /// The HTTP Method to be used with the request.
         /// </summary>
@@ -373,6 +373,10 @@ namespace Frends.Community.Gremlin.Definition
         [DisplayFormat(DataFormatString = "Text")]
         public string Host { get; set; }
 
+        [DefaultValue("false")]
+        [DisplayFormat(DataFormatString = "Text")]
+        public bool EnableSSL { get; set; }
+        
         /// <summary>
         /// List of HTTP headers to be added to the request.
         /// </summary>

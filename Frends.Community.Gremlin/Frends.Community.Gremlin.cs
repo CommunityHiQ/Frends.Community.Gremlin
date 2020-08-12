@@ -23,7 +23,7 @@ namespace Frends.Community.Gremlin
             CancellationToken cancellationToken)
         {
             // Synchronised scheduling of tasks
-            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            var scheduler = TaskScheduler.Current;
 
             // Gremlin server configuration
             var gremlinServer = InitializeGremlinServer(serverConfiguration, datasourceConfiguration);
@@ -38,13 +38,13 @@ namespace Frends.Community.Gremlin
             return responses;
         }
         
-        
         public static async Task<IList<string>> ExecuteScriptQuery(
             [PropertyTab] ScriptQueries graphScriptQueries,
             [PropertyTab] DatasourceConfiguration datasourceConfiguration,
             [PropertyTab] ServerConfiguration serverConfiguration,
             CancellationToken cancellationToken)
         {
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
             // Synchronised scheduling of tasks
             var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
@@ -67,6 +67,8 @@ namespace Frends.Community.Gremlin
             [PropertyTab] ServerConfiguration serverConfiguration,
             CancellationToken cancellationToken)
         {
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            
             // Synchronised scheduling of tasks
             var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
@@ -86,8 +88,11 @@ namespace Frends.Community.Gremlin
 
         private static GremlinServer InitializeGremlinServer(ServerConfiguration serverConfiguration, DatasourceConfiguration datasourceConfiguration)
         {
-            var gremlinServer = new GremlinServer(serverConfiguration.Host, serverConfiguration.Port, enableSsl: true,
-                username: "/dbs/" + datasourceConfiguration.Database + "/colls/" + datasourceConfiguration.Collection,
+            var gremlinServer = new GremlinServer(
+                serverConfiguration.Host, 
+                serverConfiguration.Port,
+                enableSsl: serverConfiguration.EnableSSL,
+                username: datasourceConfiguration.Username, //datasourceConfiguration.Collection,
                 password: datasourceConfiguration.AuthKey);
             return gremlinServer;
         }

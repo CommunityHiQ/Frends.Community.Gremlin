@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ namespace Frends.Community.Gremlin.Tests
     {
         VertexQueries _graphVertexQueries = new VertexQueries();
         ParamaterQueries _parameterQueries = new ParamaterQueries();
+        ScriptQueries _scriptQueries = new ScriptQueries();
         ServerConfiguration _input = new ServerConfiguration();
         QueryProperty[] _gremlinQueryProperties = new QueryProperty[]{};
         GraphQueries.GraphContainer.VertexPropertyForGraph[] _vertexPropertyForGraphs = new GraphQueries.GraphContainer.VertexPropertyForGraph[]{};
@@ -24,13 +26,12 @@ namespace Frends.Community.Gremlin.Tests
         GraphQueries.GraphContainer.VertexForGraph _vertexForGraph = new GraphQueries.GraphContainer.VertexForGraph();
 
         [SetUp]
-        public void setUp()
+        public void SetUp()
         {
             _input = new ServerConfiguration()
             {
-                Host = "40.69.7.172/gremlin?",
+                Host = "40.69.7.172",
                 Port = 8182
-                //Message = Environment.GetEnvironmentVariable("ExampleEnviromentVariable", EnvironmentVariableTarget.User)
             };
 
             Vertex v1 = new Vertex("HR Dictionary","Person");
@@ -41,11 +42,13 @@ namespace Frends.Community.Gremlin.Tests
             SetUpVertexPropertyQueries(_vertexForGraph);
             
             _graphVertexQueries.Vertices = new GraphQueries.GraphContainer.VertexForGraph[]{_vertexForGraph};
-            _graphVertexQueries.BuildGraphMessage();
             
+            _graphVertexQueries.BuildGraphMessage();
             
             _parameterQueries.GremlinQueryProperties = this.SetUpQueryProperties();//SetUpQueryProperties() == null ? new Options.QueryProperty[] { } : SetUpQueryProperties();
             
+            _scriptQueries.GremlinScript = "{AddVertex, g.addV('person').property('id', '1').property('firstName', 'Thomas').property('age', 44)}";
+         
             _datasourceConfiguration = new DatasourceConfiguration()
             {
             };
@@ -92,16 +95,16 @@ namespace Frends.Community.Gremlin.Tests
         /// <summary>
         /// You need to Frends.Community.Gremlin.SetPaswordsEnv.ps1 before running unit test, or some other way set environment variables e.g. with GitHub Secrets.
         /// </summary>
-        //[Test]
+        [Test]
+        [Ignore("Ignore a test")]
         public async Task GivenKnownGraphQueryWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
         {
             IList<string> results = Gremlin.ExecuteVertexQuery(_graphVertexQueries, _datasourceConfiguration, _input, CancellationToken.None).Result;
             
-            /**foreach (T o in results.ToList())
+            foreach (dynamic i in results.ToList())
             {
-               Console.WriteLine(o.ToString());  
-            }**/
-            
+               Console.WriteLine(i.ToString());  
+            }
             //List<object> gremlinResponses = results.
             //gremlinResponses.ForEach(i => Console.WriteLine(i.ToString()));
             //gremlinResponses.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSet.Result)); 
@@ -109,54 +112,40 @@ namespace Frends.Community.Gremlin.Tests
             //results.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSet.Result)); 
             //results.ForEach(i => Console.WriteLine(i.Value));
             //Assert.AreEqual(1, results.Count());
-            /*
-            var results =
-                
-                Response response = new Response();
-                r
-
-                var results = 
-                //options.GremlinQueryProperties.Select(q =>
-                new Response()
-                {
-                    Key = q.Key,
-                    dynamicResultSet = Gremlin.ExecuteSingleQuery(input, options, configuration, CancellationToken.None),
-                }).AsParallel().ToList();
-            results.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSet.Result)); 
-            results.ForEach(i => Console.WriteLine(i.Value));
-            Assert.AreEqual(1, results.Count());*/
+            Assert.AreEqual(1, results.Count());
         }
         
         /// <summary>
         /// You need to Frends.Community.Gremlin.SetPaswordsEnv.ps1 before running unit test, or some other way set environment variables e.g. with GitHub Secrets.
         /// </summary>
         [Test]
+        [Ignore("Ignore a test")]
         public async Task GivenKnownPropertyMapWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
         {
-            //Task<ResultSet<Object>> dynamicResultSet =
-              //  Gremlin.ExecuteQuery(input, options, configuration, CancellationToken.None);
-            //var response = await Gremlin.ExecuteQuery(input, options, configuration, CancellationToken.None);
-            
-            Task<IList<string>> results = Gremlin.ExecuteParameterQuery(_parameterQueries, _datasourceConfiguration, _input, CancellationToken.None);
-            //results.Result;
-            /*
-            var results = _graphQueries.GremlinQueryProperties?.Select(q =>
-               
-                new Response()
-                {
-                    Key = q.Key,
-                    dynamicResultSetForResponse = Gremlin.ExecuteParameterQuery(_input, _datasourceConfiguration, _graphQueries, CancellationToken.None),
-                }).AsParallel().ToList();
-            */
-            //IList<object> results = response as IList<object>;
-            //results?.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSetForResponse.Result)); 
-            //results?.ForEach(i => Console.WriteLine(i.Value));
-            //if(results!=null)
-                //Assert.AreEqual(4, results?.Count());
+            Task<IList<string>> response = Task.FromResult(await Gremlin.ExecuteParameterQuery(_parameterQueries, _datasourceConfiguration, _input, CancellationToken.None));
+            IList<string> results = response.Result.ToArray();
+            foreach (dynamic entry in results)
+            {
+                Console.WriteLine("Given: entry " + entry);
+            }
+            Assert.AreEqual(1, results.Count());
+        }
+
+        [Test]
+        [Ignore("Ignore a test")]
+        public async Task GivenKnownScriptQueryWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
+        {
+            Task<IList<string>> response = Gremlin.ExecuteScriptQuery(_scriptQueries, _datasourceConfiguration, _input, CancellationToken.None);
+            IList<string> results = response.Result.ToArray();
+            foreach (dynamic entry in results)
+            {
+                Console.WriteLine("Given: entry " + entry);
+            }
+            Assert.AreEqual(1, results.Count());
         }
         
         [TearDown]
-        public void cleanUp()
+        public void CleanUp()
         {
             _gremlinQueryProperties = null;
             _input = null;
