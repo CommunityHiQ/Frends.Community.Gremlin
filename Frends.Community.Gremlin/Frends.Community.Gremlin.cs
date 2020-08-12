@@ -44,10 +44,11 @@ namespace Frends.Community.Gremlin
             [PropertyTab] ServerConfiguration serverConfiguration,
             CancellationToken cancellationToken)
         {
-            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            //SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
             // Synchronised scheduling of tasks
-            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
+            //var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            var scheduler = TaskScheduler.Current;
+            
             // Gremlin server configuration
             var gremlinServer = InitializeGremlinServer(serverConfiguration, datasourceConfiguration);
 
@@ -67,11 +68,12 @@ namespace Frends.Community.Gremlin
             [PropertyTab] ServerConfiguration serverConfiguration,
             CancellationToken cancellationToken)
         {
-            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            //SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
             
             // Synchronised scheduling of tasks
-            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
+            //var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            var scheduler = TaskScheduler.Current;
+            
             // Gremlin server configuration
             var gremlinServer = InitializeGremlinServer(serverConfiguration, datasourceConfiguration);
 
