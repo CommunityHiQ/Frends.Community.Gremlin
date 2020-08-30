@@ -36,7 +36,6 @@ namespace Frends.Community.Gremlin.Definition
         /// <summary>
         /// Free pay load query to Graph API server.
         /// </summary>
-        /// TODO : make UI easy to use
         /// [UIHint(
         /// { "Cleanup",        "g.V().drop()" },
         /// { "AddVertex 1",    "g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('age', 44)" },
@@ -79,21 +78,12 @@ namespace Frends.Community.Gremlin.Definition
                 GraphContainer graph = new GraphContainer();
                 Vertex vertex = new Vertex(v.VertexId, v.VertexLabel);
                 graph.Vertices.Add(vertex);
-                
-                //TinkerFactory.createModern()
-                //"g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('age', 44)" 
-                //Vertex marko = graph.addVertex(T.label, "person", T.id, 1, "name", "marko", "age", 29);
-                //builder.Append("Graph g = TinkerGraph.open();");
-                //builder.Append("'Vertex " + vertex.Id + "' =  g.addVertex(T.label,'" + vertex.Label + ")");
-                //builder.Append(")");
-                //builder.Append(vertex.ToString()).Append(vertex.ToString());
                 builder.Append(vertex.ToString());
                 v.VertexProperties?.ToList().ForEach(p =>
                 {
                     VertexProperty vertexProperty = new VertexProperty(p.id, p.label, p.value, vertex);
                     graph.VertexProperties.Add(vertexProperty);
                     builder.Append(".property('" + vertexProperty.Key + "', '" + vertexProperty.Value + "')");
-                    //builder.Append(vertexProperty.ToString()).Append(vertex.ToString());
                     foreach (var item in v.VertexProperties?.Select((entry, index) => new { index }))
                     {
                         builder.Append(v.VertexProperties?.ToList().Count - 1 == item.index ? "" : ",");
@@ -105,7 +95,6 @@ namespace Frends.Community.Gremlin.Definition
                     Vertex toVertex = new Vertex(graph.Vertices.Select(i => e.toVertexId == i.Id).Single());
                     Edge edge = new Edge(e.id, toVertex, e.label, fromVertex);
                     graph.Edges.Add(edge);
-                    //$"e[{Id}][{OutV.Id}-{Label}->{InV.Id}]";
                     builder.Append(edge.ToString());
                     v.Filters.ToList().ForEach(f =>
                     {
@@ -119,10 +108,6 @@ namespace Frends.Community.Gremlin.Definition
                     });
                     graphs.Add((graph));
                 });
-                /// { "Filter Range",   "g.V().hasLabel('person').has('age', gt(40))" },
-                /// { "Project",        "g.V().hasLabel('person').values('firstName')" },
-                /// { "Sort",           "g.V().hasLabel('person').order().by('firstName', decr)" },
-                /// { "Sort",           "g.V().hasLabel('person').has('age', gt(40)).order().by('firstName', decr)" },
                 v.Filters?.ToList().ForEach(f =>
                 {
                     builder.Append(".haslabel('" + f.label + "')").Append(
@@ -133,8 +118,6 @@ namespace Frends.Community.Gremlin.Definition
                         builder.Append(v.Filters?.ToList().Count - 1 == item.index ? "" : ",");
                     }
                 });
-                /// { "Traverse",       "g.V('thomas').out('knows').hasLabel('person')" },
-                /// { "Traverse 2x",    "g.V('thomas').out('knows').hasLabel('person').out('knows').hasLabel('person')" },
                 v.Traversals?.ToList().ForEach(t =>
                 {
                     builder.Append(".out('" + t.edge + "')").Append(".hasLabel('" + t.label + ")");
@@ -143,7 +126,6 @@ namespace Frends.Community.Gremlin.Definition
                         builder.Append(v.Traversals?.ToList().Count - 1 == item.index ? "" : ",");
                     }
                 });
-                /// { "Loop",           "g.V('thomas').repeat(out()).until(has('id', 'robin')).path()" },
                 v.Loops?.ToList().ForEach(l =>
                 {
                     builder
@@ -155,8 +137,6 @@ namespace Frends.Community.Gremlin.Definition
                         builder.Append(v.Loops?.ToList().Count - 1 == item.index ? "" : ",");
                     } 
                 });
-                /// { "DropEdge",       "g.V('thomas').outE('knows').where(inV().has('id', 'mary')).drop()" },
-                /// { "CountEdges",     "g.E().count()" },
                 v.DropEdges?.ToList().ForEach(de =>
                 {
                     builder.Append(".outE('" + de.edge + "')").Append(
@@ -166,7 +146,6 @@ namespace Frends.Community.Gremlin.Definition
                         builder.Append(v.DropEdges?.ToList().Count - 1 == item.index ? "" : ",");
                     } 
                 });
-                /// { "DropVertex",     "g.V('thomas').drop()" }, 
                 v.DropVertexes?.ToList().ForEach(de => { builder.Append(".drop()"); });
             });
             builder.Append("}");
@@ -216,14 +195,6 @@ namespace Frends.Community.Gremlin.Definition
 
             public class VertexPropertyForGraph
             {
-                /*
-                public VertexPropertyForGraph(string id, string label, string value)
-                {
-                    this.id = id;
-                    this.label = label;
-                    this.value = value;
-                }*/
-
                 public string id { get; set; }
 
                 public string label { get; set; }
@@ -233,15 +204,6 @@ namespace Frends.Community.Gremlin.Definition
 
             public class EdgeForGraph
             {
-                /*
-                public EdgeForGraph(string id, string fromVertexId, string label, string toVertexId)
-                {
-                    this.id = id;
-                    this.fromVertexId = fromVertexId;
-                    this.label = label;
-                    this.toVertexId = toVertexId;
-                }*/
-
                 public string id { get; set; }
 
                 public string fromVertexId { get; set; }
@@ -250,20 +212,9 @@ namespace Frends.Community.Gremlin.Definition
 
                 public string toVertexId { get; set; }
             }
-
-            /// { "Filter Range",   "g.V().hasLabel('person').has('age', gt(40))" },
-            /// { "Project",        "g.V().hasLabel('person').values('firstName')" },
-            /// { "Sort",           "g.V().hasLabel('person').order().by('firstName', decr)" },
+            
             public class FilterForGraph
             {
-                /*
-                public FilterForGraph(string label, string key, string value)
-                {
-                    this.label = label;
-                    this.key = key;
-                    this.value = value;
-                }*/
-
                 public string label { get; set; }
                 public string key { get; set; }
                 public string value { get; set; }
