@@ -1,14 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Frends.Community.Gremlin.Definition;
-using Gremlin.Net.Driver;
-using Gremlin.Net.Process.Traversal;
 using Gremlin.Net.Structure;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Frends.Community.Gremlin.Tests
@@ -28,29 +25,31 @@ namespace Frends.Community.Gremlin.Tests
         [SetUp]
         public void SetUp()
         {
-            _input = new ServerConfiguration()
-            {
-                Host = "40.69.7.172",
-                Port = 8182
-            };
-
+            // Defining the vertex query
             Vertex v1 = new Vertex("HR Dictionary","Person");
-            
             _vertexForGraph = new GraphQueries.GraphContainer.VertexForGraph();
             _vertexForGraph.VertexId = ""+v1.Id;
             _vertexForGraph.VertexLabel = v1.Label;
             SetUpVertexPropertyQueries(_vertexForGraph);
-            
-            _graphVertexQueries.Vertices = new GraphQueries.GraphContainer.VertexForGraph[]{_vertexForGraph};
-            
-            _graphVertexQueries.BuildGraphMessage();
-            
-            _parameterQueries.GremlinQueryProperties = this.SetUpQueryProperties();//SetUpQueryProperties() == null ? new Options.QueryProperty[] { } : SetUpQueryProperties();
-            
-            _scriptQueries.GremlinScript = "{AddVertex, g.addV('person').property('id', '1').property('firstName', 'Thomas').property('age', 44)}";
-         
+          
+            // Defining the query paramaters for created vertex data
+            _parameterQueries.GremlinQueryParameters = this.SetUpQueryProperties();//SetUpQueryProperties() == null ? new Options.QueryProperty[] { } : SetUpQueryProperties();
+            _scriptQueries.GremlinScript =
+                "Graph graph = TinkerGraph.open();" +
+                "g = graph.traversal;" +
+                "g.addV('person').property('id', '1').property('firstName', 'Thomas').property('age', 44);";
+
             _datasourceConfiguration = new DatasourceConfiguration()
             {
+                Collection = "/dbs/", Database = "test"
+            };
+            
+            // def
+            _input = new ServerConfiguration()
+            {
+                Host = "localhost",
+                Port = 8182,
+                EnableSSL = false
             };
         }
 
@@ -67,9 +66,9 @@ namespace Frends.Community.Gremlin.Tests
                     id = "2", label = "Name", value = "Tuomas"
                 };
             _vertexPropertyForGraphs = new [] {vertexProperty1, vertexProperty2};
+            //GraphQueries.GraphContainer;
         }
         
-        //private static Options.QueryProperty[] SetUpQueryProperties()
         private QueryProperty[] SetUpQueryProperties()
         {
             QueryProperty q1 = new QueryProperty();
@@ -81,23 +80,24 @@ namespace Frends.Community.Gremlin.Tests
             q2.Value = "10";
 
             QueryProperty q3 = new QueryProperty();
-            q3.Key = "z=x+y";
-            q3.Value = "z";
+            q3.Key = "i=x+y";
+            q3.Value = "i";
 
             QueryProperty q4 = new QueryProperty();
             q4.Key = "valuemap";
             q4.Value = "true";
-
             _gremlinQueryProperties = new [] {q1, q2, q3, q4};
+            
+            
             return _gremlinQueryProperties;
         }
 
         /// <summary>
-        /// You need to Frends.Community.Gremlin.SetPaswordsEnv.ps1 before running unit test, or some other way set environment variables e.g. with GitHub Secrets.
+        /// 
         /// </summary>
         [Test]
-        [Ignore("Ignore a test")]
-        public async Task GivenKnownGraphQueryWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
+        //[Ignore("Ignore a test")]
+        public async Task GivenKnownVertexPropertiesWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
         {
             IList<string> results = Gremlin.ExecuteVertexQuery(_graphVertexQueries, _datasourceConfiguration, _input, CancellationToken.None).Result;
             
@@ -105,21 +105,14 @@ namespace Frends.Community.Gremlin.Tests
             {
                Console.WriteLine(i.ToString());  
             }
-            //List<object> gremlinResponses = results.
-            //gremlinResponses.ForEach(i => Console.WriteLine(i.ToString()));
-            //gremlinResponses.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSet.Result)); 
-            //gremlinResponses.ForEach(i => Console.WriteLine(i.Value));
-            //results.Select(r => r.Value = JsonConvert.SerializeObject(r.dynamicResultSet.Result)); 
-            //results.ForEach(i => Console.WriteLine(i.Value));
-            //Assert.AreEqual(1, results.Count());
             Assert.AreEqual(1, results.Count());
         }
         
         /// <summary>
-        /// You need to Frends.Community.Gremlin.SetPaswordsEnv.ps1 before running unit test, or some other way set environment variables e.g. with GitHub Secrets.
+        /// Makes a query into the backend system with a given key value pair.
         /// </summary>
         [Test]
-        [Ignore("Ignore a test")]
+        //[Ignore("Ignore a test")]
         public async Task GivenKnownPropertyMapWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
         {
             Task<IList<string>> response = Task.FromResult(await Gremlin.ExecuteParameterQuery(_parameterQueries, _datasourceConfiguration, _input, CancellationToken.None));
@@ -131,6 +124,9 @@ namespace Frends.Community.Gremlin.Tests
             Assert.AreEqual(1, results.Count());
         }
 
+        /// <summary>
+        /// Makes a query into the backend system with a given Graph script
+        /// </summary>
         [Test]
         [Ignore("Ignore a test")]
         public async Task GivenKnownScriptQueryWhenExecutingGraphQueryThenValidatedResponseMustBeReturnedFromGraphApi()
@@ -143,7 +139,7 @@ namespace Frends.Community.Gremlin.Tests
             }
             Assert.AreEqual(1, results.Count());
         }
-        
+
         [TearDown]
         public void CleanUp()
         {

@@ -26,7 +26,7 @@ namespace Frends.Community.Gremlin.Definition
 
     public class ParamaterQueries
     {
-        public QueryProperty[] GremlinQueryProperties { get; set; }
+        public QueryProperty[] GremlinQueryParameters { get; set; }
     }
     
     /// <summary>
@@ -66,26 +66,38 @@ namespace Frends.Community.Gremlin.Definition
             get; set;
         }
         
-        public IList<GraphContainer> BuildGraphMessage()
+        public IList<GraphContainer> BuildGraphMessage(VertexQueries vertexQueries)
         {
-            StringBuilder builder = new StringBuilder("g.V().drop()");
+            StringBuilder builder = new StringBuilder();
+            builder.Append("{Graph graph = TinkerFactory.createModern()}");
+            builder.Append("{g = graph.traversal()}");
+            builder.Append("{g.V().drop()}");
             builder.Append("{");
             IList<GraphContainer> graphs = new List<GraphContainer>();
-            VertexQueries vertexQueries = new VertexQueries();
-            vertexQueries.Vertices?.ToList().ForEach(v =>
+            vertexQueries?.Vertices?.ToList().ForEach(v =>
             {
                 GraphContainer graph = new GraphContainer();
                 Vertex vertex = new Vertex(v.VertexId, v.VertexLabel);
-                graph.Vertices.Add((vertex));
-                //builder.Append("{'Vertex " + vertex.Id + "', g.addV('" + vertex.Label + "')");
+                graph.Vertices.Add(vertex);
+                
+                //TinkerFactory.createModern()
+                //"g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('age', 44)" 
+                //Vertex marko = graph.addVertex(T.label, "person", T.id, 1, "name", "marko", "age", 29);
+                //builder.Append("Graph g = TinkerGraph.open();");
+                //builder.Append("'Vertex " + vertex.Id + "' =  g.addVertex(T.label,'" + vertex.Label + ")");
+                //builder.Append(")");
+                //builder.Append(vertex.ToString()).Append(vertex.ToString());
                 builder.Append(vertex.ToString());
                 v.VertexProperties?.ToList().ForEach(p =>
                 {
                     VertexProperty vertexProperty = new VertexProperty(p.id, p.label, p.value, vertex);
                     graph.VertexProperties.Add(vertexProperty);
-                    //builder.Append(".property('" + vertexProperty.Key + "', '" + vertexProperty.Value + "')");
-                    builder.Append(vertexProperty.ToString());
-                    builder.Append(v.VertexProperties?.Last() != null ? "" : ",");
+                    builder.Append(".property('" + vertexProperty.Key + "', '" + vertexProperty.Value + "')");
+                    //builder.Append(vertexProperty.ToString()).Append(vertex.ToString());
+                    foreach (var item in v.VertexProperties?.Select((entry, index) => new { index }))
+                    {
+                        builder.Append(v.VertexProperties?.ToList().Count - 1 == item.index ? "" : ",");
+                    }
                 });
                 v.Edges?.ToList().ForEach(e =>
                 {
@@ -100,7 +112,10 @@ namespace Frends.Community.Gremlin.Definition
                         Property property = new Property(f.label, f.value, vertex);
                         graph.Properties.Add(property);
                         builder.Append(property.ToString());
-                        builder.Append(v.VertexProperties?.Last() != null ? "" : ",");
+                        foreach (var item in v.Edges?.Select((entry, index) => new { index }))
+                        {
+                            builder.Append(v.Edges?.ToList().Count - 1 == item.index ? "" : ",");
+                        }
                     });
                     graphs.Add((graph));
                 });
@@ -113,14 +128,20 @@ namespace Frends.Community.Gremlin.Definition
                     builder.Append(".haslabel('" + f.label + "')").Append(
                         ".has('" + f.key + "'), " + GraphContainer.FilterForGraph.FilteringOption.GT + "(" +
                         f.value + ")).order().by('" + f.OrderByLabel + "', decr)");
-                    builder.Append(v.Filters?.Last() != null ? "" : ",");
+                    foreach (var item in v.Filters?.Select((entry, index) => new { index }))
+                    {
+                        builder.Append(v.Filters?.ToList().Count - 1 == item.index ? "" : ",");
+                    }
                 });
                 /// { "Traverse",       "g.V('thomas').out('knows').hasLabel('person')" },
                 /// { "Traverse 2x",    "g.V('thomas').out('knows').hasLabel('person').out('knows').hasLabel('person')" },
                 v.Traversals?.ToList().ForEach(t =>
                 {
                     builder.Append(".out('" + t.edge + "')").Append(".hasLabel('" + t.label + ")");
-                    builder.Append(v.Traversals?.Last() != null ? "" : ",");
+                    foreach (var item in v.Traversals?.Select((entry, index) => new { index }))
+                    {
+                        builder.Append(v.Traversals?.ToList().Count - 1 == item.index ? "" : ",");
+                    }
                 });
                 /// { "Loop",           "g.V('thomas').repeat(out()).until(has('id', 'robin')).path()" },
                 v.Loops?.ToList().ForEach(l =>
@@ -129,7 +150,10 @@ namespace Frends.Community.Gremlin.Definition
                         .Append(
                             ".repeat(out()).until(has('" + l.vertexLabel + ", '" + l.graphColumnValue + "'))")
                         .Append(".path()");
-                    builder.Append(v.Loops?.Last() != null ? "" : ",");
+                    foreach (var item in v.Loops?.Select((entry, index) => new { index }))
+                    {
+                        builder.Append(v.Loops?.ToList().Count - 1 == item.index ? "" : ",");
+                    } 
                 });
                 /// { "DropEdge",       "g.V('thomas').outE('knows').where(inV().has('id', 'mary')).drop()" },
                 /// { "CountEdges",     "g.E().count()" },
@@ -137,14 +161,17 @@ namespace Frends.Community.Gremlin.Definition
                 {
                     builder.Append(".outE('" + de.edge + "')").Append(
                         ".where(inV()).has('" + de.graphColumnKey + ", '" + de.graphColumnValue + "').drop()");
-                    builder.Append(v.DropEdges?.Last() != null ? "" : ",");
+                    foreach (var item in v.DropEdges?.Select((entry, index) => new { index }))
+                    {
+                        builder.Append(v.DropEdges?.ToList().Count - 1 == item.index ? "" : ",");
+                    } 
                 });
                 /// { "DropVertex",     "g.V('thomas').drop()" }, 
                 v.DropVertexes?.ToList().ForEach(de => { builder.Append(".drop()"); });
             });
             builder.Append("}");
             this.MessageContainer = builder.ToString();
-            Console.Out.WriteLine(this.MessageContainer);
+            Console.Out.WriteLine("This is a debug message : " + this.MessageContainer);
             return graphs;
         }
         
