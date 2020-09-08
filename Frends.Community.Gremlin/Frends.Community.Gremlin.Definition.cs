@@ -78,7 +78,8 @@ namespace Frends.Community.Gremlin.Definition
                 GraphContainer graph = new GraphContainer();
                 Vertex vertex = new Vertex(v.VertexId, v.VertexLabel);
                 graph.Vertices.Add(vertex);
-                builder.Append(vertex.ToString());
+                builder.Append("g.addV('" + vertex.Label + "')");
+                //builder.Append(vertex.ToString());
                 v.VertexProperties?.ToList().ForEach(p =>
                 {
                     VertexProperty vertexProperty = new VertexProperty(p.id, p.label, p.value, vertex);
@@ -315,12 +316,10 @@ namespace Frends.Community.Gremlin.Definition
 
     public class Response
     {
-        public string Key { get; set; }
-
-        public string Value { get; set; }
+        public Task<ResultSet<dynamic>> Key { get; set; }
+        public Task<ResultSet<dynamic>> Value { get; set; }
         
         public Task<ResultSet<dynamic>> dynamicResultSetForQuery { get; set; }
-
         public Task<ResultSet<dynamic>> dynamicResultSetForResponse { get; set; }
     }
 
