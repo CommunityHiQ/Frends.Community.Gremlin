@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFrameworks>net471;netstandard2.0;net6.0;net8.0</TargetFrameworks>
     
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -9,13 +9,21 @@
   <ItemGroup>
     <PackageReference Include="Gremlin.Net" Version="3.4.7" />
     <PackageReference Include="GremlinQueryPackage" Version="0.3.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Gremlins.DataAccess" Version="1.0.5" />
-    <PackageReference Include="nunit" Version="3.10.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
+    <PackageReference Include="nunit" Version="3.14.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
+    <PackageReference Include="Gremlins.DataAccess" Version="1.0.5" />
+    <PackageReference Include="nunit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
   </ItemGroup>
 
   <ItemGroup>

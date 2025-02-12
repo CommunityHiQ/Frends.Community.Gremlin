@@ -120,3 +120,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | Version | Changes |
 | ------- | ------- |
 | 1.0.0   | Public release of the connector. |
+| 1.1.0   | Added support for netstandard2.0, net6.0 and net8.0 |
